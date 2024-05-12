@@ -3,10 +3,68 @@ import tkinter as tk
 from math import cos, sin, sqrt, pi
 from random import choice
 
+
+window_width = 3000
+window_height = 1500
+
+
+
 root = tk.Tk()
+root.configure(bg="white")
 root.title("marbling")
-window_width = 4000
-window_height = 2000
+
+
+
+
+class scale:
+
+    def __init__(self,platform,length,value,min,max,step,name,):
+        self.group_box_frame = tk.Frame(platform, bg="white", bd=5,highlightthickness=0)
+        self.group_box_frame.pack(padx=10, pady=10,side=tk.LEFT)
+
+        self.scale = tk.Scale(self.group_box_frame, from_=min, to=max, orient=tk.HORIZONTAL, length=length, showvalue=value, resolution=step,bg="white",border=5)
+        self.scale.pack()
+        self.selected_value = tk.StringVar(value=f"{name}: {self.scale.get()}")
+        self.label = tk.Label(self.group_box_frame, textvariable=self.selected_value,bg="white")
+        self.label.pack()
+        self.scale.config(command=lambda *args: self.selected_value.set(f"{name}: {self.scale.get()}"))
+    def give(self):
+        return self.group_box_frame
+    def give_value(self):
+        return self.scale.get()
+
+class config:
+    polygonSides = None
+    random_color = True
+    random_size = False
+    fixed_size = None
+    @staticmethod
+    def racalc():
+        config.polygonSides = poly_side.give_value()
+        config.random_color = True
+        config.fixed_size = size.give_value()
+
+
+group_box_menu = tk.Frame(root, bg="white", bd=5)
+group_box_menu.pack(fill=tk.BOTH, expand=True)
+poly_side = scale(group_box_menu,300,100,3,600,5,"poly count sides")
+size = scale(group_box_menu,300,100,10,600,10,"size")
+
+check_button_var = tk.BooleanVar()
+def check_box_random_size():
+    config.random_size = not config.random_size
+rand_size = tk.Checkbutton(group_box_menu, text="random size", variable=check_button_var,onvalue=True, offvalue=False, command=check_box_random_size,bg="white")
+rand_size.pack(fill=tk.BOTH,side=tk.LEFT)
+
+
+
+
+
+
+
+
+
+
 # Create a canvas
 canvas = tk.Canvas(root, width=window_width, height=window_height)
 canvas.pack()
@@ -19,18 +77,28 @@ center = (window_width / 2, window_height / 2)
 circles = []
 
 
+
 class circle:
     def __init__(self, x=center[0], y=center[1]):
+        config.racalc()
         self.points = [(x, y)]
         self._points = []
         self.position = (x, y)
-        self.circle_radius = random.randint(50,300)
+        self.circle_radius = random.randint(30,250) if config.random_size else config.fixed_size
+
         self._points.append((self.circle_radius, 0))
-        self.side = 600
+        self.side = config.polygonSides
         self.angel = 360 / self.side
         self.radian = (self.angel / 180) * pi
         self.color = choice(
-            ["Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Pink", "Brown", "Gray", "Black"])
+            [
+                "red", "orange", "yellow", "green", "blue", "indigo", "violet",
+                "black", "white", "gray", "wheat", "beige", "brown", "pink",
+                "purple", "cyan", "magenta", "lime", "olive", "navy",
+                "maroon", "teal", "silver", "gold", "coral", "tomato",
+                "chocolate", "plum", "azure", "orchid", "salmon"
+            ]
+        )
         self.calculate_dot()
         circles.append(self)
 
@@ -53,8 +121,6 @@ class circle:
 
     def draw(self):
         self.draw_dot()
-
-
 class manage_window:
     @staticmethod
     def mathematical(c: tuple, p: tuple, r: float):
@@ -68,9 +134,6 @@ class manage_window:
         right = (right_p * mines[0], right_p * mines[1])
         result = (right[0] + c[0], right[1] + c[1])
         return result
-
-
-
     @staticmethod
     def calculate_new_circles(circle):
         circleI =circle
@@ -92,8 +155,43 @@ class manage_window:
                               fill="white")
         for circleI in circles:
             circleI.draw()
+    @staticmethod
+    def brushy(event):
+      c=15
+      z = 60
+      u = 1/pow(2,1/c)
+
+      for circle in circles:
+          for index in range(0, len(circle.points)):
+            minus = abs(circle.points[index][0] - event.x)
+            right = pow(u,minus) * z
+            result = right + circle.points[index][1]
+            circle.points[index] = (circle.points[index][0], result)
+
+      for circle in circles:
+          circle.draw()
+    @staticmethod
+    def brushx(event):
+      c=15
+      z = 60
+      u = 1/pow(2,1/c)
+
+      for circle in circles:
+          for index in range(0, len(circle.points)):
+            minus = abs(circle.points[index][1] - event.y)
+            right = pow(u,minus) * z
+            result = right + circle.points[index][0]
+            circle.points[index] = ( result,circle.points[index][1])
+
+      for circle in circles:
+          circle.draw()
 
 
-root.bind("<Button-1>", manage_window.draw_circle)
+canvas.bind("<Button-1>", manage_window.draw_circle)
+
+
+root.bind("<s>", manage_window.brushy)
+root.bind("<w>", manage_window.brushx)
+
 
 root.mainloop()
