@@ -1,4 +1,4 @@
-![marblig image](./demo.png)
+![marblig image](./demo.jpg)
 
 
 # Marbling Effect with Tkinter
