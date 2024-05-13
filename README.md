@@ -1,6 +1,7 @@
 ![marblig image](./demo.jpg)
 
 
+For more details about Mathematical Marbling, please refer to [Mathematical Marbling](https://people.csail.mit.edu/jaffer/Marbling).
 # Marbling Effect with Tkinter
 
 This Python script generates a marbling effect using circles in a Tkinter canvas. It allows users to customize various parameters such as the number of sides of the polygons, the size of the circles, and whether the size should be random or fixed. Users can also interact with the canvas using mouse clicks and keyboard inputs to create unique patterns.
